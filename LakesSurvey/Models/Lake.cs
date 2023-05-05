@@ -6,7 +6,7 @@ public class Lake
     public decimal LittoralAcres { get; set; }
     public List<object> WaterClarity { get; set; }
     public string AverageWaterClarity { get; set; }
-    public string LakeName { get; set; }
+    public string? LakeName { get; set; }
     public decimal ShoreLengthMiles { get; set; }
     public List<object> SampledPlants { get; set; }
     public decimal AreaAcres { get; set; }

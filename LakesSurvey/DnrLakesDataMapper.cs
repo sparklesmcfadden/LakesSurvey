@@ -48,20 +48,39 @@ public class DnrLakesDataMapper
 
         foreach (var lake in lakeList)
         {
+            if (_context.LakeList.Any(l => l.LakeId == lake.LakeId))
+            {
+                continue;
+            }
             _context.LakeList.Add(lake);
         }
 
         await _context.SaveChangesAsync();
     }
 
-    public async Task<int> LoadSurveyResult(DnrLakeSurveyResponse<LakesSurvey.Models.Lake> lakeSurvey)
+    public async Task<List<Survey>> GetSurveys(string lakeId)
+    {
+        return await _context.Surveys.Include(s => s.Lake)
+            .Where(s => s.Lake.LakeId == lakeId).ToListAsync();
+    }
+
+    public bool SurveyExists(string surveyNumber)
+    {
+        return _context.Surveys.Any(s => s.SurveyNumber == surveyNumber);
+    }
+
+    public async Task<int> LoadSurveyResult(DnrLakeSurveyResponse<LakesSurvey.Models.Lake> lakeSurvey, LakeIdList lakeId)
     {
         var surveys = new List<Survey>();
 
-        lakeSurvey.Result.Surveys.ForEach(s =>
+        foreach (var survey in lakeSurvey.Result.Surveys)
         {
+            if (SurveyExists(survey.SurveyId))
+            {
+                continue;
+            }
             var fish = new List<Fish>();
-            s.LengthsObj.ForEach(f =>
+            survey.LengthsObj.ForEach(f =>
             {
                 var lengthCounts = new List<LengthCount>();
                 f.FishCount.ForEach(l =>
@@ -83,24 +102,28 @@ public class DnrLakesDataMapper
             
             surveys.Add(new Survey
             {
-                SurveyNumber = s.SurveyId,
-                SurveyType = s.SurveyType,
-                SurveyDate = s.SurveyDate,
-                Narrative = s.Narrative,
+                SurveyNumber = survey.SurveyId,
+                SurveyType = survey.SurveyType,
+                SurveyDate = survey.SurveyDate,
+                Narrative = survey.Narrative,
                 Fish = fish
             });
-        });
-        
+        }
+
         var lake = new Lake
         {
             LakeId = lakeSurvey.Result.DOWNumber,
-            LakeName = lakeSurvey.Result.LakeName,
+            LakeName = lakeSurvey.Result.LakeName ?? lakeId.LakeName,
             Acres = lakeSurvey.Result.AreaAcres,
             AverageDepth = lakeSurvey.Result.MeanDepthFeet,
             MaximumDepth = lakeSurvey.Result.MaxDepthFeet,
             Surveys = surveys
         };
 
+        if (_context.Lakes.Any(l => l.LakeId == lake.LakeId))
+        {
+            return 0;
+        }
         _context.Lakes.Add(lake);
         await _context.SaveChangesAsync();
         return lake.Id;

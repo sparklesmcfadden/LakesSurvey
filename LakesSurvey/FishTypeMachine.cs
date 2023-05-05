@@ -1535,6 +1535,11 @@ public class FishTypeMachine
           FishLongName = (string)formattedLongName
         };
 
+        if (_context.FishTypes.Any(f => f.FishShortName == speciesShortName))
+        {
+          continue;
+        }
+        
         _context.FishTypes.Add(fishType);
         await _context.SaveChangesAsync();
       }
