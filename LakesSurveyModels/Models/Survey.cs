@@ -5,7 +5,7 @@ namespace LakesSurveyModels.Models;
 public class Survey
 {
     [Key]
-    public int SurveyId { get; set; }
+    public long SurveyId { get; set; }
     public string SurveyNumber { get; set; }
     public string SurveyType { get; set; }
     public DateTime SurveyDate { get; set; }

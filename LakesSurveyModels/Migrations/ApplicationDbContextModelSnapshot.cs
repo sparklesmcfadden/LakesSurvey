@@ -40,8 +40,8 @@ namespace LakesSurveyModels.Migrations
                     b.Property<int>("MinimumLength")
                         .HasColumnType("integer");
 
-                    b.Property<int>("SurveyId")
-                        .HasColumnType("integer");
+                    b.Property<long>("SurveyId")
+                        .HasColumnType("bigint");
 
                     b.HasKey("FishId");
 
@@ -166,11 +166,11 @@ namespace LakesSurveyModels.Migrations
 
             modelBuilder.Entity("LakesSurveyModels.Models.Survey", b =>
                 {
-                    b.Property<int>("SurveyId")
+                    b.Property<long>("SurveyId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
+                        .HasColumnType("bigint");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("SurveyId"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("SurveyId"));
 
                     b.Property<int>("LakeId")
                         .HasColumnType("integer");
