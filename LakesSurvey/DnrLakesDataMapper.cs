@@ -10,7 +10,7 @@ namespace LakesSurvey;
 
 public class DnrLakesDataMapper
 {
-    private ApplicationDbContext _context;
+    private readonly ApplicationDbContext _context;
     
     public DnrLakesDataMapper()
     {
@@ -35,7 +35,7 @@ public class DnrLakesDataMapper
         return _context.LakeList.ToList();
     }
 
-    public async Task UpdateLakeList(LakeIdList lake, int survey)
+    public async Task UpdateLakeList(LakeIdList lake, long survey)
     {
         lake.Survey = survey;
         _context.Update(lake);
@@ -69,9 +69,10 @@ public class DnrLakesDataMapper
         return _context.Surveys.Any(s => s.SurveyNumber == surveyNumber);
     }
 
-    public async Task<int> LoadSurveyResult(DnrLakeSurveyResponse<LakesSurvey.Models.Lake> lakeSurvey, LakeIdList lakeId)
+    public async Task<long> LoadSurveyResult(DnrLakeSurveyResponse<LakesSurvey.Models.Lake> lakeSurvey, LakeIdList lakeId)
     {
         var surveys = new List<Survey>();
+        long lastSurveyId = 0;
 
         foreach (var survey in lakeSurvey.Result.Surveys)
         {
@@ -99,15 +100,17 @@ public class DnrLakesDataMapper
                     MinimumLength = f.MinimumLength
                 });
             });
-            
-            surveys.Add(new Survey
+
+            var newSurvey = new Survey
             {
                 SurveyNumber = survey.SurveyId,
                 SurveyType = survey.SurveyType,
                 SurveyDate = survey.SurveyDate,
                 Narrative = survey.Narrative,
                 Fish = fish
-            });
+            };
+            
+            surveys.Add(newSurvey);
         }
 
         var lake = new Lake
@@ -119,13 +122,20 @@ public class DnrLakesDataMapper
             MaximumDepth = lakeSurvey.Result.MaxDepthFeet,
             Surveys = surveys
         };
-
-        if (_context.Lakes.Any(l => l.LakeId == lake.LakeId))
+        
+        var existingLake = await _context.Lakes.FirstOrDefaultAsync(l => l.LakeId == lake.LakeId);
+        if (existingLake != null)
         {
+            existingLake.Surveys = surveys;
+            _context.Lakes.Update(existingLake);
+            await _context.SaveChangesAsync();
             return 0;
         }
+        
         _context.Lakes.Add(lake);
         await _context.SaveChangesAsync();
-        return lake.Id;
+        
+        lastSurveyId = surveys.Any() ? surveys.MaxBy(s => s.SurveyDate)!.SurveyId : 0;
+        return lastSurveyId;
     }
 }

@@ -10,7 +10,7 @@ namespace LakesSurvey;
 
 public class DnrApiClient
 {
-    private HttpClient _client;
+    private readonly HttpClient _client;
 
     public DnrApiClient()
     {
@@ -30,13 +30,11 @@ public class DnrApiClient
         {
             var content = JsonConvert.DeserializeObject<DnrLakeSurveyResponse<Lake>>(contentString);
 
-            
-            content.Result.Surveys.ForEach(s =>
+            content?.Result?.Surveys.ForEach(s =>
             {
                 var lengths = new List<Lengths>();
                 foreach (var item in s.Lengths)
                 {
-
                     var counts = new List<FishCount>();
                     foreach (var count in item.Value["fishCount"])
                     {
@@ -46,7 +44,7 @@ public class DnrApiClient
                             Length = (int)count[0]
                         });
                     }
-                    
+                        
                     lengths.Add(new Lengths
                     {
                         Species = item.Key,
@@ -58,14 +56,13 @@ public class DnrApiClient
 
                 s.LengthsObj = lengths;
             });
-            
+
             return content;
         }
 
         return new DnrLakeSurveyResponse<Lake>
         {
             Message = "No results",
-            Result = null,
             Timestamp = 0,
             Status = "No results"
         };

@@ -47,10 +47,11 @@ public class SurveyProcessor
                     await tDataMapper.UpdateLakeList(lakeId, surveyId);
                 }
             }
-            catch
+            catch (Exception e)
             {
                 await tDataMapper.UpdateLakeList(lakeId, -2);
                 Console.WriteLine($"Unable to get data for {lakeId.LakeId} ({lakeId.LakeName})");
+                Console.WriteLine($"Exception: {e.Message}");
             }
         });
         
@@ -77,7 +78,7 @@ public class SurveyProcessor
             try
             {
                 var surveyResult = await _apiClient.GetSurveyResponse(lakeId.LakeId);
-                if (surveyResult.Status != "SUCCESS" && !(lakeId.Survey > 0))
+                if (surveyResult.Status != "SUCCESS")
                 {
                     await dataMapper.UpdateLakeList(lakeId, -1);
                     return;
@@ -90,10 +91,11 @@ public class SurveyProcessor
                     await dataMapper.UpdateLakeList(lakeId, surveyId);
                 }
             }
-            catch
+            catch (Exception e)
             {
                 await dataMapper.UpdateLakeList(lakeId, -2);
                 Console.WriteLine($"Unable to get data for {lakeId.LakeId} ({lakeId.LakeName})");
+                Console.WriteLine($"Exception: {e.Message}");
             }
         }
         

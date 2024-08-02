@@ -8,6 +8,6 @@ public class LakeIdList
     public string City { get; set; }
     public string County { get; set; }
     public string Coordinates { get; set; }
-    public int Survey { get; set; }
+    public long Survey { get; set; }
     public double Distance { get; set; }
 }

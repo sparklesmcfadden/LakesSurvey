@@ -132,8 +132,8 @@ namespace LakesSurveyModels.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int>("Survey")
-                        .HasColumnType("integer");
+                    b.Property<long>("Survey")
+                        .HasColumnType("bigint");
 
                     b.HasKey("Id");
 
