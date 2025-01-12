@@ -30,7 +30,7 @@ public class SurveyProcessor
         await Parallel.ForEachAsync(lakeList, options , async (lakeId, ct) =>
         {
             var tDataMapper = new DnrLakesDataMapper();
-            Console.WriteLine($"Getting survey for {lakeId.LakeId} ({lakeId.LakeName}), {lakeId.County} County...");
+            Console.WriteLine($"Getting surveys for {lakeId.LakeId} ({lakeId.LakeName}), {lakeId.County} County...");
             try
             {
                 var surveyResult = await _apiClient.GetSurveyResponse(lakeId.LakeId);
@@ -81,7 +81,7 @@ public class SurveyProcessor
                 if (surveyResult.Status != "SUCCESS")
                 {
                     await dataMapper.UpdateLakeList(lakeId, -1);
-                    return;
+                    continue;
                 }
 
                 var surveyId = await dataMapper.LoadSurveyResult(surveyResult, lakeId);

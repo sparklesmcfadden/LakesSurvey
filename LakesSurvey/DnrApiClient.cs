@@ -21,7 +21,7 @@ public class DnrApiClient
 
     public async Task<DnrLakeSurveyResponse<Lake>> GetSurveyResponse(string lakeId)
     {
-        var url = "https://maps2.dnr.state.mn.us/cgi-bin/lakefinder/detail.cgi?type=lake_survey&id=" + lakeId;
+        var url = "https://maps.dnr.state.mn.us/cgi-bin/lakefinder/detail.cgi?type=lake_survey&id=" + lakeId;
 
         var response = await _client.GetAsync(url);
         var contentString = await response.Content.ReadAsStringAsync();
@@ -72,12 +72,13 @@ public class DnrApiClient
     {
         var lakes = new List<LakeIdList>();
         
+        Console.WriteLine("Getting lakes...");
+        
         for (int i = 1; i <= 87; i++)
         {
-            Console.WriteLine(i);
-            var url = "https://maps2.dnr.state.mn.us/cgi-bin/lakefinder_json.cgi?county=" + i;
-
+            var url = "https://maps.dnr.state.mn.us/cgi-bin/lakefinder/search.cgi?county=" + i;
             var response = await _client.GetAsync(url);
+            
             var contentString = await response.Content.ReadAsStringAsync();
 
             if (!string.IsNullOrEmpty(contentString))
