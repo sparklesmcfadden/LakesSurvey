@@ -97,7 +97,7 @@ public class DnrApiClient
                     {
                         LakeId = (string)lake["id"],
                         LakeName = (string)lake["name"],
-                        City = (string)lake["nearest_town"],
+                        City = (string)lake["nearest_town"] == null ? "" : (string)lake["nearest_town"],
                         County = (string)lake["county"],
                         Coordinates = $"{(string)lake["point"]["epsg:4326"][0]}, {(string)lake["point"]["epsg:4326"][1]}",
                         Distance = distance
